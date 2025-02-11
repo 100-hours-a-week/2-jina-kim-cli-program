@@ -1,13 +1,8 @@
-import bank_program.Account;
-import bank_program.CheckingAccount;
-import bank_program.SavingAccount;
-import bank_program.StudentAccount;
+import bank_program.*;
 
 import java.util.HashMap;
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -20,8 +15,14 @@ public class Main {
             System.out.println("2. 계좌 선택");
             System.out.println("3. 종료");
             System.out.print("선택: ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("숫자를 입력하세요.");
+                scanner.next();
+                continue;
+            }
             int choice = scanner.nextInt();
-            scanner.nextLine();  // 버퍼 비우기
+            scanner.nextLine();
 
             if (choice == 1) {
                 // 계좌 생성
@@ -38,8 +39,18 @@ public class Main {
                 String owner = scanner.nextLine();
 
                 System.out.print("초기 잔액을 입력하세요: ");
+                if (!scanner.hasNextDouble()) {
+                    System.out.println("올바른 금액을 입력하세요.");
+                    scanner.next();
+                    continue;
+                }
                 double initialBalance = scanner.nextDouble();
                 scanner.nextLine();
+
+                if (initialBalance < 0) {
+                    System.out.println("초기 잔액은 0 이상이어야 합니다.");
+                    continue;
+                }
 
                 // 계좌 타입 선택
                 System.out.println("계좌 타입을 선택하세요: ");
@@ -47,22 +58,35 @@ public class Main {
                 System.out.println("2. 저축 계좌");
                 System.out.println("3. 학생 계좌");
 
-                int accountType = scanner.nextInt();
+                if (!scanner.hasNextInt()) {
+                    System.out.println("숫자를 입력하세요.");
+                    scanner.next();
+                    continue;
+                }
+                int accountTypeInput = scanner.nextInt();
                 scanner.nextLine();
 
-                Account account = null;
+                AccountType accountType;
+                switch (accountTypeInput) {
+                    case 1 -> accountType = AccountType.CHECKING;
+                    case 2 -> accountType = AccountType.SAVING;
+                    case 3 -> accountType = AccountType.STUDENT;
+                    default -> {
+                        System.out.println("잘못된 입력입니다.");
+                        continue;
+                    }
+                }
 
-                if (accountType == 1) {
+                Account account;
+
+                if (accountType == AccountType.CHECKING) {
                     account = new CheckingAccount(accountNumber, owner, initialBalance);
-                } else if (accountType == 2) {
+                } else if (accountType == AccountType.SAVING) {
                     account = new SavingAccount(accountNumber, owner, initialBalance);
                     System.out.println("저축 계좌 이자율은 2%입니다.");
-                } else if (accountType == 3) {
+                } else {
                     account = new StudentAccount(accountNumber, owner, initialBalance);
                     System.out.println("학생 계좌는 저축 계좌이며, 저축 계좌 이자율은 2%입니다.");
-                } else {
-                    System.out.println("잘못된 입력입니다.");
-                    continue;
                 }
 
                 accounts.put(accountNumber, account);
@@ -88,17 +112,47 @@ public class Main {
                     System.out.println("3. 잔액 확인");
                     System.out.println("4. 계좌 선택으로 돌아가기");
                     System.out.print("선택: ");
+
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("숫자를 입력하세요.");
+                        scanner.next();
+                        continue;
+                    }
                     int subChoice = scanner.nextInt();
                     scanner.nextLine();  // 버퍼 비우기
 
                     if (subChoice == 1) {
                         System.out.print("입금할 금액을 입력하세요: ");
+                        if (!scanner.hasNextDouble()) {
+                            System.out.println("올바른 금액을 입력하세요.");
+                            scanner.next();
+                            continue;
+                        }
                         double depositAmount = scanner.nextDouble();
                         account.deposit(depositAmount);
+
+                        if (depositAmount <= 0) {
+                            System.out.println("입금 금액은 0보다 커야 합니다.");
+                        } else {
+                            account.deposit(depositAmount);
+                        }
+
                     } else if (subChoice == 2) {
                         System.out.print("출금할 금액을 입력하세요: ");
+                        if (!scanner.hasNextDouble()) {
+                            System.out.println("올바른 금액을 입력하세요.");
+                            scanner.next();
+                            continue;
+                        }
                         double withdrawAmount = scanner.nextDouble();
-                        account.withdraw(withdrawAmount);
+                        scanner.nextLine();
+
+                        if (withdrawAmount <= 0) {
+                            System.out.println("출금 금액은 0보다 커야 합니다.");
+                        } else {
+                            account.withdraw(withdrawAmount);
+                        }
+
                     } else if (subChoice == 3) {
                         account.checkBalance();
                     } else if (subChoice == 4) {

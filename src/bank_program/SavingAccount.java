@@ -28,10 +28,19 @@ public class SavingAccount extends Account {
             return;
         }
 
-        super.withdraw(money);
-        withdrawalCount++;
+        if (money <= 0) {
+            System.out.println("출금 금액은 0보다 커야 합니다.");
+            return;
+        }
 
-        System.out.println("출금이 완료되었습니다. 현재 출금 횟수: " + withdrawalCount + "/" + maxWithdrawals);
+        if (balance >= money) {
+            super.withdraw(money);
+            withdrawalCount++;
+            System.out.println("출금이 완료되었습니다. 현재 출금 횟수: " + withdrawalCount + "/" + maxWithdrawals);
+            return;
+        }
+
+        System.out.println("잔액이 부족합니다.");
     }
 
 }
